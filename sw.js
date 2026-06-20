@@ -5,7 +5,7 @@
 //  - Cross-origin requests (Google Fonts): cache-as-you-go, so once the
 //    fonts are fetched the first time online, they keep working offline too.
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = 'plate-auction-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -97,26 +97,30 @@ const PRECACHE_URLS = [
   './css/styles.css',
   './index.html',
   './js/app.js',
-  './manifest.json'
+  './manifest.json',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches
+      .open(CACHE_NAME)
       .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -132,14 +136,16 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
-        return fetch(request).then((response) => {
-          if (response && response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        }).catch(() => caches.match('./index.html'));
-      })
+        return fetch(request)
+          .then((response) => {
+            if (response && response.ok) {
+              const copy = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          })
+          .catch(() => caches.match('./index.html'));
+      }),
     );
     return;
   }
@@ -159,7 +165,8 @@ self.addEventListener('fetch', (event) => {
           })
           .catch(() => cached);
         return cached || networkFetch;
-      })
-    )
+      }),
+    ),
   );
 });
+
