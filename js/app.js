@@ -5,6 +5,15 @@
 // paths under /assets.
 // ============================================================
 
+// Shared check: is a countdown currently running? The timer module
+// (below) toggles this class on enterRunningMode/returnToSetupMode.
+// Used to (a) stop the plate from being editable mid-auction and
+// (b) gate the premium tilt effect to auction-only.
+function isAuctionLive() {
+  const panel = document.querySelector('.upper-panel');
+  return !!panel && panel.classList.contains('timer-running');
+}
+
 // ===== Shared keyboard overlay (single source of truth) =====
 // Both the letter-keyboard and number-keyboard IIFEs below call into
 // window._overlay instead of each touching the overlay DOM/classes
@@ -218,6 +227,8 @@
     minutesInput.value = 0;
     secondsInput.value = 0;
     updateDisplayFromInputs();
+    // Auction's over — make sure the plate isn't left mid-tilt.
+    if (window._plateTilt) window._plateTilt.reset();
   }
 
   startBtn.addEventListener('click', () => {
@@ -602,6 +613,9 @@
 
   letterSlotEls.forEach((el, i) => {
     el.addEventListener('click', () => {
+      // The live plate is a read-only preview once the auction starts —
+      // don't let a tap clear the entered letters mid-auction.
+      if (isAuctionLive()) return;
       if (letterSlotState[i] !== null) {
         clearLetterSlotsFrom(i);
         renderLetterInputDisplay();
@@ -803,6 +817,8 @@
 
   numberSlotEls.forEach((el, i) => {
     el.addEventListener('click', () => {
+      // Same as the letter slots: read-only preview during a live auction.
+      if (isAuctionLive()) return;
       if (numberSlotState[i] !== null) {
         clearNumberSlotsFrom(i);
         renderNumberInputDisplay();
@@ -845,5 +861,60 @@
       });
     });
   });
+})();
+
+// ===== Premium 3D tilt on the live plate — auction only =====
+// Active only while isAuctionLive() is true: tilts toward the mouse
+// on a PC (plain hover, no click needed) and toward the finger on a
+// touchscreen (pointermove naturally only fires while touching, since
+// touch has no hover state — so the same handler covers both).
+(function () {
+  const plateSection = document.querySelector('.plate-section');
+  const plateDisplay = document.getElementById('plateDisplay');
+  if (!plateSection || !plateDisplay) return;
+
+  const MAX_TILT_DEG = 7; // subtle — premium, not gimmicky
+  const ACTIVE_SCALE = 1.015;
+
+  function applyTilt(clientX, clientY) {
+    const rect = plateDisplay.getBoundingClientRect();
+    const px = (clientX - rect.left) / rect.width; // 0 -> 1 across the plate
+    const py = (clientY - rect.top) / rect.height; // 0 -> 1 down the plate
+
+    const rotateY = (px - 0.5) * 2 * MAX_TILT_DEG;
+    const rotateX = (0.5 - py) * 2 * MAX_TILT_DEG;
+
+    plateDisplay.style.transition = 'transform 0.05s linear, box-shadow 0.05s linear';
+    plateDisplay.style.transform =
+      `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(${ACTIVE_SCALE})`;
+
+    // Shadow drifts opposite the tilt so the plate reads as "lifted"
+    // toward whichever corner is angled up.
+    const shadowX = (px - 0.5) * -22;
+    const shadowY = (py - 0.5) * -22 + 16;
+    plateDisplay.style.boxShadow =
+      `${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px 36px rgba(0, 0, 0, 0.32)`;
+  }
+
+  function resetTilt() {
+    plateDisplay.style.transition = 'transform 0.45s ease, box-shadow 0.45s ease';
+    plateDisplay.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+    plateDisplay.style.boxShadow = '';
+  }
+
+  plateSection.addEventListener('pointermove', (e) => {
+    if (!isAuctionLive()) return;
+    applyTilt(e.clientX, e.clientY);
+  });
+
+  // Mouse leaving the section, or a finger lifting off mid-touch —
+  // either way, ease back to neutral instead of freezing mid-tilt.
+  plateSection.addEventListener('pointerleave', resetTilt);
+  plateSection.addEventListener('pointerup', resetTilt);
+  plateSection.addEventListener('pointercancel', resetTilt);
+
+  // Exposed so returnToSetupMode() can force a reset if the auction
+  // ends while a pointer is still resting on the plate.
+  window._plateTilt = { reset: resetTilt };
 })();
 

@@ -122,11 +122,22 @@
   }
 
   /* 2. Plate display section */
+  .plate-section {
+    /* Perspective lives on the parent so the plate itself tilts in 3D
+       space rather than just skewing flat. */
+    perspective: 900px;
+  }
+
   .plate-display {
     position: relative;
     width: 100%;
     line-height: 0;
     margin-bottom: 3rem;
+    transform-style: preserve-3d;
+    will-change: transform;
+    /* Prevent the page from scrolling while a finger drags across the
+       plate during the tilt effect (auction mode only). */
+    touch-action: none;
   }
 
   .plate-bg-img {
@@ -307,15 +318,14 @@
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .slot-en {
-      margin-top: 5px;
+      margin-top: 3px;
     }
   }
 
-  /* plate-8 */
   #plateDisplay.shape-plate-8 .plate-slots-letters {
     top: 15%;
     bottom: 15%;
@@ -323,23 +333,23 @@
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .slot-en {
-      margin-top: 5px;
+      margin-top: 3px;
     }
   }
 
   /* رياضية ٧ (plate-9) */
   #plateDisplay.shape-plate-9 .plate-slots-numbers {
-    top: 15%;
-    bottom: 15%;
+    top: 10%;
+    bottom: 10%;
     left: 10%;
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 2px;
+      margin-bottom: 5px;
     }
 
     .slot-en {
@@ -348,13 +358,13 @@
   }
 
   #plateDisplay.shape-plate-9 .plate-slots-letters {
-    top: 15%;
-    bottom: 15%;
+    top: 10%;
+    bottom: 10%;
     left: 65%;
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 2px;
+      margin-bottom: 5px;
     }
 
     .slot-en {
