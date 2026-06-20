@@ -301,13 +301,13 @@
 
   /* رياضية ٦ (plate-8) */
   #plateDisplay.shape-plate-8 .plate-slots-numbers {
-    top: 10%;
-    bottom: 10%;
+    top: 15%;
+    bottom: 15%;
     left: 10%;
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
 
     .slot-en {
@@ -316,13 +316,13 @@
   }
 
   #plateDisplay.shape-plate-8 .plate-slots-letters {
-    top: 10%;
-    bottom: 10%;
+    top: 15%;
+    bottom: 15%;
     left: 65%;
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
 
     .slot-en {
@@ -332,13 +332,13 @@
 
   /* رياضية ٧ (plate-9) */
   #plateDisplay.shape-plate-9 .plate-slots-numbers {
-    top: 10%;
-    bottom: 10%;
+    top: 15%;
+    bottom: 15%;
     left: 10%;
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
 
     .slot-en {
@@ -347,13 +347,13 @@
   }
 
   #plateDisplay.shape-plate-9 .plate-slots-letters {
-    top: 10%;
-    bottom: 10%;
+    top: 15%;
+    bottom: 15%;
     left: 65%;
     width: 25%;
 
     .slot-ar {
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
 
     .slot-en {
