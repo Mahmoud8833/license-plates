@@ -370,11 +370,13 @@ function isAuctionLive() {
       if (PLATE_CATEGORIES[opt.dataset.plateId]) {
         opt.dataset.category = PLATE_CATEGORIES[opt.dataset.plateId];
       }
-      // Clear all entered letters/numbers when plate type changes
-      if (typeof window._clearLetterSlots === 'function')
-        window._clearLetterSlots();
-      if (typeof window._clearNumberSlots === 'function')
-        window._clearNumberSlots();
+      // Switching plate type only changes the shape/style classes —
+      // the entered letters/numbers are still valid data, so keep them
+      // and just re-render under the new plate's display rules.
+      if (typeof window._refreshLetterSlots === 'function')
+        window._refreshLetterSlots();
+      if (typeof window._refreshNumberSlots === 'function')
+        window._refreshNumberSlots();
     });
   });
 })();
@@ -548,16 +550,6 @@ function isAuctionLive() {
     renderLetterSlots();
   }
 
-  function clearLetterSlotsFrom(index) {
-    for (let i = index; i < letterSlotState.length; i++) {
-      letterSlotState[i] = null;
-    }
-    renderLetterSlots();
-    // Editing again — restore the dashed guide boxes until the admin
-    // finishes (overlay closes) and we collapse trailing empties again.
-    uncollapseLetterSlots();
-  }
-
   // Clears just the one tapped slot (e.g. fixing a single wrong letter)
   // without touching any other already-entered letters.
   function clearSingleLetterSlot(index) {
@@ -634,9 +626,9 @@ function isAuctionLive() {
   renderLetterSlots();
   renderLetterInputDisplay();
 
-  // Expose clear function globally so plate selector can call it
-  window._clearLetterSlots = function () {
-    clearLetterSlotsFrom(0);
+  // Exposed so the plate selector can re-render the current letters
+  // under a newly-selected plate's classes, without losing them.
+  window._refreshLetterSlots = function () {
     renderLetterSlots();
     renderLetterInputDisplay();
   };
@@ -765,14 +757,6 @@ function isAuctionLive() {
     renderNumberSlots();
   }
 
-  function clearNumberSlotsFrom(index) {
-    for (let i = index; i < numberSlotState.length; i++) {
-      numberSlotState[i] = null;
-    }
-    renderNumberSlots();
-    uncollapseNumberSlots();
-  }
-
   // Clears just the one tapped digit (e.g. fixing a single wrong
   // number) without touching any other already-entered digits.
   function clearSingleNumberSlot(index) {
@@ -845,9 +829,9 @@ function isAuctionLive() {
   renderNumberSlots();
   renderNumberInputDisplay();
 
-  // Expose clear function globally
-  window._clearNumberSlots = function () {
-    clearNumberSlotsFrom(0);
+  // Exposed so the plate selector can re-render the current numbers
+  // under a newly-selected plate's classes, without losing them.
+  window._refreshNumberSlots = function () {
     renderNumberSlots();
     renderNumberInputDisplay();
   };

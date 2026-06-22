@@ -83,19 +83,6 @@
     text-align: center;
   }
 
-  /* Placeholder styling - remove once real content is added */
-  .placeholder {
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text-muted);
-    font-size: 13px;
-    text-align: center;
-    padding: var(--space-sm);
-  }
-
   /* 1. Logo section */
   .logo-section {
     display: flex;
@@ -344,7 +331,7 @@
   /* رياضية ٧ (plate-9) */
   #plateDisplay.shape-plate-9 .plate-slots-numbers {
     top: 10%;
-    bottom: 10%;
+    bottom: 15%;
     left: 10%;
     width: 25%;
 
@@ -359,7 +346,7 @@
 
   #plateDisplay.shape-plate-9 .plate-slots-letters {
     top: 10%;
-    bottom: 10%;
+    bottom: 15%;
     left: 65%;
     width: 25%;
 
